@@ -1,3 +1,5 @@
+import { Placeholder } from './game-components/placeholder';
+
 const rowSize = 8;
 
 
@@ -38,24 +40,6 @@ class MainBox {
 
     private DrawRow(): JQuery<HTMLElement> {
         return $(`<div class='row'></div>`);
-    }
-}
-
-class Placeholder {
-    private _elem: JQuery<HTMLElement>;
-
-    Size: number;
-    RowNo: number;
-    ColumnNo: number;
-    IsFilled: boolean;
-
-    HasBead() {
-        return this.IsFilled;
-    }
-
-    Draw(): JQuery<HTMLElement> {
-        this._elem = $(`<div class='placeholder'></div>`);
-        return this._elem;
     }
 }
 

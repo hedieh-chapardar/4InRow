@@ -7,3 +7,5 @@ jQuery(() => {
     const mainBoxElem = mainBoxObj.Draw();
     $('#wrapper').append(mainBoxElem);
 });
+
+

@@ -1,13 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Placeholder = void 0;
-class Placeholder {
-    HasBead() {
+var Placeholder = /** @class */ (function () {
+    function Placeholder() {
+    }
+    Placeholder.prototype.HasBead = function () {
         return this.IsFilled;
-    }
-    Draw() {
-        this._elem = $(`<div class='placeholder'></div>`);
+    };
+    Placeholder.prototype.Draw = function () {
+        this._elem = $("<div class='placeholder'></div>");
         return this._elem;
-    }
-}
-exports.Placeholder = Placeholder;
+    };
+    return Placeholder;
+}());
+export { Placeholder };

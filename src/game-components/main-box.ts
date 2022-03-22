@@ -1,34 +1,45 @@
+import { Bead } from "./bead";
 import { Placeholder } from "./placeholder";
 
 export class MainBox {
+
+    size: number;
+    placeholders: Placeholder[][] = [];
+
     constructor(size: number) {
-        this.Size = size;
+        this.size = size;
     }
 
-    Size: number;
-    Placeholders: number[][] = [];
+    draw(): JQuery<HTMLElement> {
+        let box = this.drawBox();
+        for (let rowIndex = 0; rowIndex < this.size; rowIndex++) {
+            this.placeholders[rowIndex] = [];
+            let rowElement = this.drawRow();
+            for (let columnIndex = 0; columnIndex < this.size; columnIndex++) {
+                let placeholder = new Placeholder();
+                this.setPlaceholders(rowIndex, columnIndex, placeholder);
+                const placeholderElement = placeholder.draw();
 
-    Draw(): JQuery<HTMLElement> {
-        let box = this.DrawBox();
-        for (let rowIndex = 0; rowIndex <= this.Size - 1; rowIndex++) {
-            this.Placeholders[rowIndex] = [];
-            let rowElem = this.DrawRow();
-            for (let columnIndex = 0; columnIndex <= this.Size - 1; columnIndex++) {
-                this.Placeholders[rowIndex][columnIndex] = columnIndex;
-                let placeholderObj = new Placeholder();
-                const placeholderElem = placeholderObj.Draw();
-                rowElem.append(placeholderElem);
+                placeholder.onClick.subscribe(() => {
+                    placeholder.addBead(new Bead());
+                });
+
+                rowElement.append(placeholderElement);
             }
-            box.append(rowElem);
+            box.append(rowElement);
         }
         return box;
     }
 
-    private DrawBox(): JQuery<HTMLElement> {
+    private setPlaceholders(rowIndex: number, columnIndex: number, placeholder: Placeholder) {
+        this.placeholders[rowIndex][columnIndex] = placeholder;
+    }
+
+    private drawBox(): JQuery<HTMLElement> {
         return $(`<div id='box'></div>`);
     }
 
-    private DrawRow(): JQuery<HTMLElement> {
+    private drawRow(): JQuery<HTMLElement> {
         return $(`<div class='row'></div>`);
     }
 }

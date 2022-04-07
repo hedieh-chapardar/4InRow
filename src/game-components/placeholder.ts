@@ -29,7 +29,7 @@ export class Placeholder {
         if (this.hasBead()) return;
         
         this._bead = bead;
-        let beadElem = bead.Draw();
-        this._element.append(beadElem);
+        const beadElement = bead.Draw();
+        this._element.append(beadElement);
     }
 }

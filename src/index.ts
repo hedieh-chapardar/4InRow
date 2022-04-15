@@ -1,9 +1,9 @@
 import { MainBox } from './game-components/main-box';
 
-const rowSize = 8;
+const gameSize = 8;
 
 jQuery(() => {
-    const mainBox = new MainBox(rowSize);
+    const mainBox = new MainBox(gameSize);
     const mainBoxElement = mainBox.draw();
     $('#wrapper').append(mainBoxElement);
 });

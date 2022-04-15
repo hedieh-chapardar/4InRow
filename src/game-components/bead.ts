@@ -1,8 +1,8 @@
 export class Bead {
     color: ColorEnum;
 
-    Draw(): JQuery<HTMLElement> {
-        return $(`<div class='bead bg-red'></div>`);
+    draw(): JQuery<HTMLElement> {
+        return $(`<div class='bead real-bead bg-red'></div>`);
     }
 }
 

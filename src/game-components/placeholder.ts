@@ -1,7 +1,8 @@
 import { Subject } from "rxjs";
-import { Bead } from './bead'
+import { Base } from "./base";
+import { Bead } from './bead';
 
-export class Placeholder {
+export class Placeholder implements Base {
     private _element: JQuery<HTMLElement>;
     private _bead: Bead;
 
@@ -29,7 +30,7 @@ export class Placeholder {
         if (this.hasBead()) return;
         
         this._bead = bead;
-        const beadElement = bead.Draw();
+        const beadElement = bead.draw();
         this._element.append(beadElement);
-    }
+    }    
 }

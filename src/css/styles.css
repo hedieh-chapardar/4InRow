@@ -21,7 +21,7 @@ body {
     border-radius: 8px;    
 }
 
-#box {
+#main-box {
     position: relative;
     display: flex;
     flex-direction: column;

@@ -1,10 +1,10 @@
-import { Base } from './base';
+import { BaseComponent } from './base-component';
 import { Bead } from './bead';
 
-export class FakeBead extends Bead implements Base {
+export class FakeBead extends Bead implements BaseComponent {
     private _element: JQuery<HTMLElement>;
     /**
-     * Width & height (based on game size, etc.) 
+     * Width & height sizes (based on game size, etc.) 
      */
     private _size: number;
     /**

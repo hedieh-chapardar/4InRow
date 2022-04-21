@@ -1,12 +1,20 @@
-import { Base } from "./base";
+import { BaseComponent } from "./base-component";
 import { Bead } from "./bead";
 import { FakeBead } from "./fake-bead";
 import { Placeholder } from "./placeholder";
-import { CellInfo } from "./cell-info";
-import { SizeConstants } from "./constants";
+import { CellInfo } from "../models/cell-info";
+import { SizeConstants } from "../constants/size-constants";
 
-export class MainBox implements Base {
+export class MainBox implements BaseComponent {
     private _element: JQuery<HTMLElement>;
+    /**
+     * Game size numeber
+     */
+    private _gameSize: number;
+    /**
+     * Placeholders array in the main box
+     */
+    private _placeholders: Placeholder[][] = [];
     /**
      * Placeholder width/height in px which depends on game size */
     private _placeholderInnerSize: number;
@@ -15,39 +23,47 @@ export class MainBox implements Base {
      */
     private _isMainBoxClickable: boolean = true;
 
-    gameSize: number;
-    placeholders: Placeholder[][] = [];
-
     constructor(gameSize: number) {
-        this.gameSize = gameSize;
+        this._gameSize = gameSize;
         this.setPlaceholderInnerSize();
     }
 
     draw(): JQuery<HTMLElement> {
-        this._element = this.drawBox();
-        this.drawRowsDetails(this._element);
+        this._element = this.drawMainBox();
+        this.drawRowsDetails();
         return this._element;
     }
 
-    private drawBox(): JQuery<HTMLElement> {
+    /**
+     * Draws main box element
+     * @returns main box element
+     */
+    private drawMainBox(): JQuery<HTMLElement> {
         return $(`<div id='main-box'></div>`);
     }
 
-    private drawRowsDetails(box: JQuery<HTMLElement>) {
-        for (let rowIndex = 0; rowIndex < this.gameSize; rowIndex++) {
-            this.placeholders[rowIndex] = [];
+    /**
+     * Draws each row details (row element & columns details)
+     */
+    private drawRowsDetails(): void {
+        for (let rowIndex = 0; rowIndex < this._gameSize; rowIndex++) {
+            this._placeholders[rowIndex] = [];
             const rowElement = this.drawRow();
             this.drawColumnsDetails(rowIndex, rowElement);
-            box.append(rowElement);
+            this._element.append(rowElement);
         }
     }
 
+    /**
+     * Draws row element
+     * @returns row element
+     */
     private drawRow(): JQuery<HTMLElement> {
         return $(`<div class='row'></div>`);
     }
 
     private drawColumnsDetails(rowIndex: number, rowElement: JQuery<HTMLElement>) {
-        for (let columnIndex = 0; columnIndex < this.gameSize; columnIndex++) {
+        for (let columnIndex = 0; columnIndex < this._gameSize; columnIndex++) {
             const placeholderElement = this.addPlaceholderToCell(rowIndex, columnIndex);
             rowElement.append(placeholderElement);
         }
@@ -71,7 +87,7 @@ export class MainBox implements Base {
     /**
      * Adds the given placeholder to the given cell */
     private assignPlaceholderToCell(rowIndex: number, columnIndex: number, placeholder: Placeholder) {
-        this.placeholders[rowIndex][columnIndex] = placeholder;
+        this._placeholders[rowIndex][columnIndex] = placeholder;
     }
 
     /**
@@ -89,8 +105,8 @@ export class MainBox implements Base {
     /**
      * Gets suitable cell info in the selected/given column if exists */
     private getSuitableCellInfo(columnIndex: number): CellInfo | null {
-        for (let rowIndex = this.gameSize - 1; rowIndex >= 0; rowIndex--) {
-            const currentPlaceholder = this.placeholders[rowIndex][columnIndex];
+        for (let rowIndex = this._gameSize - 1; rowIndex >= 0; rowIndex--) {
+            const currentPlaceholder = this._placeholders[rowIndex][columnIndex];
             if (!currentPlaceholder.hasBead())
                 return { rowIndex: rowIndex, columnIndex: columnIndex };
         }
@@ -102,7 +118,7 @@ export class MainBox implements Base {
      * Adds real bead to suitable placeholder in the selected/given column 
      */
     private addRealBeadToSuitableCell(cellInfo: CellInfo): void {
-        this.placeholders[cellInfo.rowIndex][cellInfo.columnIndex].addBead(new Bead());
+        this._placeholders[cellInfo.rowIndex][cellInfo.columnIndex].addBead(new Bead());
         this._isMainBoxClickable = true;
     }
 
@@ -119,7 +135,7 @@ export class MainBox implements Base {
      * Calculates and sets placeholders inner size  
      */
     private setPlaceholderInnerSize() {
-        const placeholderSize = SizeConstants.boxSize / this.gameSize;
+        const placeholderSize = SizeConstants.boxSize / this._gameSize;
         this._placeholderInnerSize = placeholderSize - (2 * SizeConstants.placeholderMarginSize) - (2 * SizeConstants.placeholderBorderSize);
     }
 

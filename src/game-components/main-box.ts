@@ -7,7 +7,6 @@ import { SizeConstants } from "./constants";
 
 export class MainBox implements Base {
     private _element: JQuery<HTMLElement>;
-
     /**Placeholder width/height in px which depends on game size */
     private _placeholderInnerSize: number;
 
@@ -91,7 +90,7 @@ export class MainBox implements Base {
         this.placeholders[cellInfo.rowIndex][cellInfo.columnIndex].addBead(new Bead());
     }
 
-    /**Calculates a bead's final top/left which it should animate to it
+    /**Calculates a bead's final top/left which it should animate to
      * @param index row/column index of the cell (row index for top & column index for left)
      */
     private calculateFakeBeadTopOrLeft(index: number): number {
@@ -108,12 +107,11 @@ export class MainBox implements Base {
     /**Adds fake bead (which is animated to suitable cell before adding real bead to that cell) */
     private addFakeBead(cellInfo: CellInfo, callback: (cellInfo: CellInfo) => void): void {
         const animateToTop = this.calculateFakeBeadTopOrLeft(cellInfo.rowIndex);
-        const animateToLeft = this.calculateFakeBeadTopOrLeft(cellInfo.columnIndex);
+        const left = this.calculateFakeBeadTopOrLeft(cellInfo.columnIndex);
 
-        const fakeBead = new FakeBead();
+        const fakeBead = new FakeBead(this._placeholderInnerSize, left);
         const fakeBeadElement = fakeBead.draw();
-        fakeBead.setInitialStyles(this._placeholderInnerSize, animateToLeft);
         this._element.append(fakeBeadElement);
-        fakeBeadElement.animate({ top: animateToTop, left: animateToLeft }, 500, 'swing', callback.bind(this, cellInfo));
+        fakeBeadElement.animate({ top: animateToTop}, 500, 'swing', callback.bind(this, cellInfo));
     }
 }

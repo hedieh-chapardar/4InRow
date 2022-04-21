@@ -1,14 +1,11 @@
-import { BaseComponent } from "./base-component";
-import { Bead } from "./bead";
-import { FakeBead } from "./fake-bead";
-import { Placeholder } from "./placeholder";
-import { CellInfo } from "../models/cell-info";
+import { BaseComponent, Bead, FakeBead, Placeholder } from '../game-components';
+import { CellInfo } from "../models";
 import { SizeConstants } from "../constants/size-constants";
 
 export class MainBox implements BaseComponent {
     private _element: JQuery<HTMLElement>;
     /**
-     * Game size numeber
+     * Game size number
      */
     private _gameSize: number;
     /**

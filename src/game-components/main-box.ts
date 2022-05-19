@@ -1,5 +1,5 @@
 import { BaseComponent, Bead, FakeBead, Placeholder } from '../game-components';
-import { CellInfo } from "../models";
+import { Cell } from "../models";
 import { SizeConstants } from "../constants/size-constants";
 
 export class MainBox implements BaseComponent {
@@ -93,15 +93,15 @@ export class MainBox implements BaseComponent {
     private onPlaceholderClick(columnIndex: number): void {
         if (!this._isMainBoxClickable) return;
 
-        const cellInfo = this.getSuitableCellInfo(columnIndex);
-        if (!cellInfo) return;
+        const cell = this.getSuitableCellInfo(columnIndex);
+        if (!cell) return;
 
-        this.addFakeBead(cellInfo, this.addRealBeadToSuitableCell.bind(this));
+        this.addFakeBead(cell, this.addRealBeadToSuitableCell.bind(this));
     }
 
     /**
-     * Gets suitable cell info in the selected/given column if exists */
-    private getSuitableCellInfo(columnIndex: number): CellInfo | null {
+     * Gets suitable cell in the selected/given column if exists */
+    private getSuitableCellInfo(columnIndex: number): Cell | null {
         for (let rowIndex = this._gameSize - 1; rowIndex >= 0; rowIndex--) {
             const currentPlaceholder = this._placeholders[rowIndex][columnIndex];
             if (!currentPlaceholder.hasBead())
@@ -114,8 +114,8 @@ export class MainBox implements BaseComponent {
     /**
      * Adds real bead to suitable placeholder in the selected/given column 
      */
-    private addRealBeadToSuitableCell(cellInfo: CellInfo): void {
-        this._placeholders[cellInfo.rowIndex][cellInfo.columnIndex].addBead(new Bead());
+    private addRealBeadToSuitableCell(cell: Cell): void {
+        this._placeholders[cell.rowIndex][cell.columnIndex].addBead(new Bead());
         this._isMainBoxClickable = true;
     }
 
@@ -139,14 +139,14 @@ export class MainBox implements BaseComponent {
     /**
      * Adds fake bead (which is animated to suitable cell before adding real bead to that cell) 
      */
-    private addFakeBead(cellInfo: CellInfo, callback: (cellInfo: CellInfo) => void): void {
+    private addFakeBead(cell: Cell, callback: (cell: Cell) => void): void {
         this._isMainBoxClickable = false;
-        const animateToTop = this.calculateFakeBeadTopOrLeft(cellInfo.rowIndex);
-        const left = this.calculateFakeBeadTopOrLeft(cellInfo.columnIndex);
+        const animateToTop = this.calculateFakeBeadTopOrLeft(cell.rowIndex);
+        const left = this.calculateFakeBeadTopOrLeft(cell.columnIndex);
 
         const fakeBead = new FakeBead(this._placeholderInnerSize, left);
         const fakeBeadElement = fakeBead.draw();
         this._element.append(fakeBeadElement);
-        fakeBeadElement.animate({ top: animateToTop }, 500, 'swing', callback.bind(this, cellInfo));
+        fakeBeadElement.animate({ top: animateToTop }, 500, 'swing', callback.bind(this, cell));
     }
 }

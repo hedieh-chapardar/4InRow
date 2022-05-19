@@ -1,1 +1,1 @@
-export { CellInfo } from './cell-info';
+export { Cell } from './cell';

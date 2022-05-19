@@ -1,9 +1,9 @@
-import { MainBox } from './game-components/main-box';
+import { Game } from './game-components';
 
 const gameSize = 8;
+const playersCount = 2;
 
 jQuery(() => {
-    const mainBox = new MainBox(gameSize);
-    const mainBoxElement = mainBox.draw();
-    $('#wrapper').append(mainBoxElement);
+    const game = new Game(gameSize, playersCount);
+    game.drawMainBox();
 });

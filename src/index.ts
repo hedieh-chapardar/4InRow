@@ -5,5 +5,5 @@ const playersCount = 2;
 
 jQuery(() => {
     const game = new Game(gameSize, playersCount);
-    game.drawMainBox();
+    game.draw();
 });

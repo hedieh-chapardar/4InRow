@@ -1,40 +1,42 @@
 import { BaseComponent, Player } from ".";
-import { ColorEnum } from "../enums/color-enum";
+import { getBgColorClassNameBasedOnColorEnum } from "../helper/utilities";
 
 export class GameInfo implements BaseComponent {
     private _element: JQuery<HTMLElement>;
     /**
-     * Players count
+     * Players array
      */
-    private _playersCount: number;
+    _players: Player[];
 
-    players: Player[];
-
-    constructor(playersCount: number) {
-        this._playersCount = playersCount;
+    constructor(players: Player[]) {
+        this._players = players;
     }
 
     draw(): JQuery<HTMLElement> {
         this._element = $(`<div id='game-info'></div>`);
-        const playersBox = this.drawPlayersBox();
-        return this._element.append(playersBox);
+        const playersBoxElement = this.drawPlayersBox();
+        return this._element.append(playersBoxElement);
     }
 
     private drawPlayersBox(): JQuery<HTMLElement> {
-        const playersBox = $(`<div id='players-box'></div>`);
-        for (let playerIndex = 0; playerIndex < this._playersCount; playerIndex++) {
-            const player = new Player(`Player ${playerIndex + 1}`, playerIndex === 0 ? ColorEnum.red : ColorEnum.blue);
-            const playerContent = this.drawPlayerContent();
-            const playerInfoElement = this.drawPlayerInfo(player);
-            const playerBeadElement = this.drawPlayerBead(player);
-            playerContent.append([playerInfoElement, playerBeadElement]);
-            playersBox.append(playerContent);
-        }
-        return playersBox;
+        const playersBoxElement = $(`<div id='players-box'></div>`);
+        this.appendPlayersDetailsToPlayersBox(playersBoxElement);
+        return playersBoxElement;
     }
 
-    private drawPlayerContent(): JQuery<HTMLElement> {
-        return $(`<div class='player-content'></div>`);
+    private appendPlayersDetailsToPlayersBox(playersBox: JQuery<HTMLElement>) {
+        this._players.forEach((player: Player) => {
+            const playerElement = this.drawPlayer(player);
+            const playerInfoElement = this.drawPlayerInfo(player);
+            const playerBeadElement = this.drawPlayerBead(player);
+            playerElement.append([playerInfoElement, playerBeadElement]);
+            playersBox.append(playerElement);
+        });
+    }
+
+    private drawPlayer(player: Player): JQuery<HTMLElement> {
+        const activityStatusClass = player.isActive ? ' active' : '';
+        return $(`<div class='player${activityStatusClass}'></div>`);
     }
 
     private drawPlayerInfo(player: Player): JQuery<HTMLElement> {
@@ -42,6 +44,7 @@ export class GameInfo implements BaseComponent {
     }
 
     private drawPlayerBead(player: Player): JQuery<HTMLElement> {
-        return $(`<div class='player-bead ${player.color === ColorEnum.red ? `bg-red` : `bg-blue`}'></div>`);
-    }    
+        const backgroundColorClass = getBgColorClassNameBasedOnColorEnum(player.color);        
+        return $(`<div class='player-bead ${backgroundColorClass}'></div>`);
+    }
 }

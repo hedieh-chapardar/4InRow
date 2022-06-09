@@ -2,6 +2,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 #main {
@@ -15,9 +16,6 @@ body {
   display: flex;
   align-items: center;
   place-content: center;
-  /* background-color: #ccc;
-  box-shadow: 0px 0px 4px 2px #c0c0c0;
-  border-radius: 8px; */
   padding: 12px;
 }
 
@@ -52,17 +50,22 @@ body {
   align-items: center;
 }
 
-.player-content {
+.player {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
+  opacity: 0.5;
+}
+
+.player.active {
+  opacity: 1;
 }
 
 .player-info {
   font-weight: bold;
   font-size: 0.75rem;
-  color: #666;
+  color: #444;
 }
 
 .player-bead {
@@ -70,6 +73,11 @@ body {
   height: 50px;
   border-radius: 50%;
   box-shadow: 0px 0px 4px 2px #888;
+  cursor: default;
+}
+
+.player.active .player-bead {
+  cursor: pointer;
 }
 
 #main-box {
@@ -81,7 +89,7 @@ body {
   width: 100%;
   height: 400px;
   justify-content: space-between;
-  margin-top: 16px;
+  margin-top: 8px;
   background-color: #ccc;
   box-shadow: 0px 0px 4px 2px #c0c0c0;
   border-radius: 8px;
@@ -114,6 +122,10 @@ body {
   border-radius: 50%;
 }
 
+.placeholder .bead {
+  cursor: default;
+}
+
 .real-bead {
   z-index: 2;
 }
@@ -130,17 +142,4 @@ body {
 
 .bg-blue {
   background-color: blue;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.enabled-player {
-  cursor: pointer;
-}
-
-.disabled-player {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

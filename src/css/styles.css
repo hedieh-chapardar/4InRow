@@ -12,7 +12,7 @@ body {
   height: 100vh;
 }
 
-#wrapper {
+#game-wrapper {
   display: flex;
   align-items: center;
   place-content: center;
@@ -80,7 +80,7 @@ body {
   cursor: pointer;
 }
 
-#main-box {
+#game-box {
   position: relative;
   display: flex;
   flex-direction: column;

@@ -1,18 +1,18 @@
-import { BaseComponent, Bead, FakeBead, Placeholder } from '../game-components';
+import { BaseComponent, Bead, FakeBead, Placeholder } from '.';
 import { Cell } from "../models";
 import { SizeConstants } from "../constants/size-constants";
 import { Player } from './player';
 import { getActivePlayer } from '../helper/utilities';
 import { Subject } from 'rxjs';
 
-export class MainBox implements BaseComponent {
+export class GameBox implements BaseComponent {
     private _element: JQuery<HTMLElement>;
     /**
      * Game size number
      */
     private _gameSize: number;
     /**
-     * Placeholders array in the main box
+     * Placeholders array in the game box
      */
     private _placeholders: Placeholder[][] = [];
     /**
@@ -23,9 +23,9 @@ export class MainBox implements BaseComponent {
      */
     private _players: Player[];
     /**
-     * Indicated that main box is clickable or not
+     * Indicated that game box is clickable or not
      */
-    private _isMainBoxClickable: boolean = true;
+    private _isGameBoxClickable: boolean = true;
 
     onBeadAdded: Subject<any>;
 
@@ -38,7 +38,7 @@ export class MainBox implements BaseComponent {
     }
 
     draw(): JQuery<HTMLElement> {
-        this._element = this.drawMainBox();
+        this._element = this.drawGameBox();
         this.drawRowsDetails();
         return this._element;
     }
@@ -66,11 +66,11 @@ export class MainBox implements BaseComponent {
     }
 
     /**
-     * Draws main box element
-     * @returns main box element
+     * Draws game box element
+     * @returns game box element
      */
-    private drawMainBox(): JQuery<HTMLElement> {
-        return $(`<div id='main-box'></div>`);
+    private drawGameBox(): JQuery<HTMLElement> {
+        return $(`<div id='game-box'></div>`);
     }
 
     /**
@@ -123,7 +123,7 @@ export class MainBox implements BaseComponent {
      * Handles click event on some random placeholder & add bead to suitable one 
      */
     private onPlaceholderClick(columnIndex: number): void {
-        if (!this._isMainBoxClickable) return;
+        if (!this._isGameBoxClickable) return;
 
         const cell = this.getSuitableCellInfo(columnIndex);
         if (!cell) return;
@@ -150,7 +150,7 @@ export class MainBox implements BaseComponent {
         const currentActivePlayer = getActivePlayer(this._players);
         this._placeholders[cell.rowIndex][cell.columnIndex].addBead(new Bead(currentActivePlayer));
         this.onBeadAdded.next();
-        this._isMainBoxClickable = true;
+        this._isGameBoxClickable = true;
     }
 
     /**
@@ -174,7 +174,7 @@ export class MainBox implements BaseComponent {
      * Adds fake bead (which is animated to suitable cell before adding real bead to that cell) 
      */
     private addFakeBead(cell: Cell, callback: (cell: Cell) => void): void {
-        this._isMainBoxClickable = false;
+        this._isGameBoxClickable = false;
         const animateToTop = this.calculateFakeBeadTopOrLeft(cell.rowIndex);
         const left = this.calculateFakeBeadTopOrLeft(cell.columnIndex);
         const currentActivePlayer = getActivePlayer(this._players);

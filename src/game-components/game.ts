@@ -1,6 +1,6 @@
 import { ColorEnum } from '../enums/color-enum';
-import { GameInfo, MainBox, Player } from '../game-components';
-import { getActivePlayer, getActivePlayerIndex } from '../helper/utilities';
+import { GameBox, GameInfo, Player } from '../game-components';
+import { getActivePlayerIndex } from '../helper/utilities';
 
 export class Game {
     /**
@@ -22,7 +22,7 @@ export class Game {
     /**
      * Game box
      */
-    private _gameBox: MainBox;
+    private _gameBox: GameBox;
 
     constructor(gameSize: number, playersCount: number) {
         this._gameSize = gameSize;
@@ -35,8 +35,8 @@ export class Game {
     draw(): void {
         $('#game').empty();
         const gameInfoElement = this.drawGameInfo();
-        const mainBoxElement = this.drawGameBox();
-        $('#game').append([gameInfoElement, mainBoxElement]);
+        const gameBoxElement = this.drawGameBox();
+        $('#game').append([gameInfoElement, gameBoxElement]);
     }
 
     private initPlayers(): void {
@@ -54,7 +54,7 @@ export class Game {
     }
 
     private initGameBox(gameSize: number, players: Player[]): void {
-        this._gameBox = new MainBox(gameSize, players);
+        this._gameBox = new GameBox(gameSize, players);
         this._gameBox.onBeadAdded.subscribe(() => {
             const currentActivePlayerIndex = getActivePlayerIndex(this._players);
             const nextPlayerIndex = this.getNextPlayerIndex(currentActivePlayerIndex);

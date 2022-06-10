@@ -27,10 +27,12 @@ export class GameBox implements BaseComponent {
      */
     private _isGameBoxClickable: boolean = true;
 
-    onBeadAdded: Subject<any>;
+    onBeadAdded: Subject<Cell>;
+    onGameOver: Subject<Player>;
 
     constructor(gameSize: number, players: Player[]) {
         this.onBeadAdded = new Subject();
+        this.onGameOver = new Subject();
         this._gameSize = gameSize;
         this._players = players;
         this.initGameBox();
@@ -42,7 +44,19 @@ export class GameBox implements BaseComponent {
         this.drawRowsDetails();
         return this._element;
     }
-    
+
+    checkIfCurrentPlayerWins(cell: Cell): Player | null {
+        const currentPlaceholder = this._placeholders[cell.rowIndex][cell.columnIndex];
+        const currentPlayer = currentPlaceholder.getBead().getPlayer();
+        const currentPlayerWins = this.checkAllDirections(cell, currentPlayer);
+        if (currentPlayerWins) {
+            this._isGameBoxClickable = false;
+            return currentPlayer;
+        }
+
+        return null;
+    }
+
     private initGameBox(): void {
         this.initRowsDetails();
     }
@@ -149,7 +163,7 @@ export class GameBox implements BaseComponent {
     private addRealBeadToSuitableCell(cell: Cell): void {
         const currentActivePlayer = getActivePlayer(this._players);
         this._placeholders[cell.rowIndex][cell.columnIndex].addBead(new Bead(currentActivePlayer));
-        this.onBeadAdded.next();
+        this.onBeadAdded.next(cell);
         this._isGameBoxClickable = true;
     }
 
@@ -183,5 +197,175 @@ export class GameBox implements BaseComponent {
         const fakeBeadElement = fakeBead.draw();
         this._element.append(fakeBeadElement);
         fakeBeadElement.animate({ top: animateToTop }, 500, 'swing', callback.bind(this, cell));
+    }
+
+    private checkAllDirections(cell: Cell, currentPlayer: Player): boolean {
+        if (this.checkHorizontalToLeft(cell, currentPlayer))
+            return true;
+
+        if (this.checkHorizontalToRight(cell, currentPlayer))
+            return true;
+
+        if (this.checkVerticalToBottom(cell, currentPlayer))
+            return true;
+
+        if (this.checkDiagonalToTopLeft(cell, currentPlayer))
+            return true;
+
+        if (this.checkDiagonalToBottomLeft(cell, currentPlayer))
+            return true;
+
+        if (this.checkDiagonalToTopRight(cell, currentPlayer))
+            return true;
+
+        if (this.checkDiagonalToBottomRight(cell, currentPlayer))
+            return true;
+
+        return false;
+    }
+
+    private checkHorizontalToLeft(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        for (let i = cell.columnIndex; i >= 0; i--) {
+            const currentPlaceholder = this._placeholders[cell.rowIndex][i];
+            if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                count++;
+                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                    return true;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkHorizontalToRight(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        for (let i = cell.columnIndex; i < this._gameSize; i++) {
+            const currentPlaceholder = this._placeholders[cell.rowIndex][i];
+            if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                count++;
+                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                    return true;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkVerticalToBottom(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        for (let i = cell.rowIndex; i < this._gameSize; i++) {
+            const currentPlaceholder = this._placeholders[i][cell.columnIndex];
+            if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                count++;
+                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                    return true;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkDiagonalToTopLeft(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        let cellRowIndex = cell.rowIndex;
+        for (let i = cell.columnIndex; i >= 0; i--) {
+            if (cellRowIndex >= 0) {
+                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+                if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                    count++;
+                    cellRowIndex--;
+                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                        return true;
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkDiagonalToBottomLeft(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        let cellRowIndex = cell.rowIndex;
+        for (let i = cell.columnIndex; i >= 0; i--) {
+            if (cellRowIndex < this._gameSize) {
+                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+                if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                    count++;
+                    cellRowIndex++;
+                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                        return true;
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkDiagonalToTopRight(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        let cellRowIndex = cell.rowIndex;
+        for (let i = cell.columnIndex; i < this._gameSize; i++) {
+            if (cellRowIndex >= 0) {
+                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+                if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                    count++;
+                    cellRowIndex--;
+                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                        return true;
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private checkDiagonalToBottomRight(cell: Cell, currentPlayer: Player): boolean {
+        let count = 0;
+        let cellRowIndex = cell.rowIndex;
+        for (let i = cell.columnIndex; i < this._gameSize; i++) {
+            if (cellRowIndex < this._gameSize) {
+                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+                if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
+                    count++;
+                    cellRowIndex++;
+                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
+                        return true;
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    private isCurrentPlaceholderFilledByCurrentPlayer(placeholder: Placeholder, player: Player): boolean {
+        return placeholder.hasBead() && placeholder.getBead().getPlayer().color === player.color;
+    }
+
+    private checkIfPlayerHasMinimumBeadsToWin(beadsCount: number): boolean {
+        const minBeadsCount = 4;
+        return beadsCount === minBeadsCount;
     }
 }

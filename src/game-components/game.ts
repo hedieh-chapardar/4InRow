@@ -1,6 +1,7 @@
 import { ColorEnum } from '../enums/color-enum';
 import { GameBox, GameInfo, Player } from '../game-components';
 import { getActivePlayerIndex } from '../helper/utilities';
+import { Cell } from '../models';
 
 export class Game {
     /**
@@ -55,14 +56,18 @@ export class Game {
 
     private initGameBox(gameSize: number, players: Player[]): void {
         this._gameBox = new GameBox(gameSize, players);
-        this._gameBox.onBeadAdded.subscribe(() => {
+        this.subscribeToBeadAddition();
+    }
+
+    private subscribeToBeadAddition() {
+        this._gameBox.onBeadAdded.subscribe((cell: Cell) => {
             const currentActivePlayerIndex = getActivePlayerIndex(this._players);
             const nextPlayerIndex = this.getNextPlayerIndex(currentActivePlayerIndex);
             this.inactivateCurrentPlayer(currentActivePlayerIndex);
+            this.checkGameWinner(cell);
             this.activateNextPlayer(nextPlayerIndex);
             this.draw();
         });
-
     }
 
     private assignColorToPlayer(i: number): ColorEnum {
@@ -92,5 +97,13 @@ export class Game {
             return nextPlayerIndex;
 
         return 0;
+    }
+
+    private checkGameWinner(cell: Cell): void {
+        const currentPlayer: Player | null = this._gameBox.checkIfCurrentPlayerWins(cell);
+
+        if (currentPlayer) {
+            alert(`${currentPlayer.name} wins!`);
+        }
     }
 }

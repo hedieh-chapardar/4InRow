@@ -1,4 +1,5 @@
 import { Subject } from "rxjs";
+import { Cell } from "../models";
 import { BaseComponent } from "./base-component";
 import { Bead } from './bead';
 
@@ -23,6 +24,10 @@ export class Placeholder implements BaseComponent {
         this._element.on('click', this.click.bind(this));
         this.redrawBead();
         return this._element;
+    }
+
+    getBead(): Bead {
+        return this._bead;
     }
 
     /**

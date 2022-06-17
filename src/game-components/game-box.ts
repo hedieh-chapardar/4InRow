@@ -5,6 +5,11 @@ import { Player } from './player';
 import { getActivePlayer } from '../helper/utilities';
 import { Subject } from 'rxjs';
 
+/**
+ * Player minimum beads count to win the game (except the cell which is checking the condition on it)
+ */
+const winnerMinBeadsCount = 3;
+
 export class GameBox implements BaseComponent {
     private _element: JQuery<HTMLElement>;
     /**
@@ -199,90 +204,109 @@ export class GameBox implements BaseComponent {
         fakeBeadElement.animate({ top: animateToTop }, 500, 'swing', callback.bind(this, cell));
     }
 
+    /**
+     * Checks all sides of current cell
+     * @param cell current cell
+     * @param currentPlayer current player
+     * @returns true if current player has at least four beads of its color in one direction
+     */
     private checkAllDirections(cell: Cell, currentPlayer: Player): boolean {
-        if (this.checkHorizontalToLeft(cell, currentPlayer))
+        if (this.getHorizontalDirectionCount(cell, currentPlayer) >= winnerMinBeadsCount)
             return true;
 
-        if (this.checkHorizontalToRight(cell, currentPlayer))
+        if (this.getVerticalDirectionToBottomCount(cell, currentPlayer) >= winnerMinBeadsCount)
             return true;
 
-        if (this.checkVerticalToBottom(cell, currentPlayer))
+        if (this.getDiagonalDirectionToTopLeftOrBottomRightCount(cell, currentPlayer) >= winnerMinBeadsCount)
             return true;
 
-        if (this.checkDiagonalToTopLeft(cell, currentPlayer))
-            return true;
-
-        if (this.checkDiagonalToBottomLeft(cell, currentPlayer))
-            return true;
-
-        if (this.checkDiagonalToTopRight(cell, currentPlayer))
-            return true;
-
-        if (this.checkDiagonalToBottomRight(cell, currentPlayer))
+        if (this.getDiagonalDirectionToTopRightOrBottomLeftCount(cell, currentPlayer) >= winnerMinBeadsCount)
             return true;
 
         return false;
     }
 
-    private checkHorizontalToLeft(cell: Cell, currentPlayer: Player): boolean {
+    private getHorizontalDirectionCount(cell: Cell, currentPlayer: Player): number {
+        const leftCount = this.getHorizontalToLeftCount(cell, currentPlayer);
+        const rightCount = this.getHorizontalToRightCount(cell, currentPlayer);
+        return leftCount + rightCount;
+    }
+
+    private getDiagonalDirectionToTopLeftOrBottomRightCount(cell: Cell, currentPlayer: Player): number {
+        const topLeftCount = this.getDiagonalToTopLeftCount(cell, currentPlayer);
+        const bottomRightCount = this.getDiagonalToBottomRightCount(cell, currentPlayer);
+        return topLeftCount + bottomRightCount;
+    }
+
+    private getDiagonalDirectionToTopRightOrBottomLeftCount(cell: Cell, currentPlayer: Player): number {
+        const topRightCount = this.getDiagonalToTopRightCount(cell, currentPlayer);
+        const bottomLeftCount = this.getDiagonalToBottomLeftCount(cell, currentPlayer);
+        return topRightCount + bottomLeftCount;
+    }
+
+    private getHorizontalToLeftCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        for (let i = cell.columnIndex; i >= 0; i--) {
-            const currentPlaceholder = this._placeholders[cell.rowIndex][i];
+        const previousColumnIndex = cell.columnIndex - 1;
+        if (previousColumnIndex < 0) return count;
+
+        for (let colIndex = previousColumnIndex; colIndex >= 0; colIndex--) {
+            const currentPlaceholder = this._placeholders[cell.rowIndex][colIndex];
             if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                 count++;
-                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                    return true;
             }
             else
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkHorizontalToRight(cell: Cell, currentPlayer: Player): boolean {
+    private getHorizontalToRightCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        for (let i = cell.columnIndex; i < this._gameSize; i++) {
-            const currentPlaceholder = this._placeholders[cell.rowIndex][i];
+        const nextColumnIndex = cell.columnIndex + 1;
+        if (nextColumnIndex >= this._gameSize) return count;
+
+        for (let colIndex = nextColumnIndex; colIndex < this._gameSize; colIndex++) {
+            const currentPlaceholder = this._placeholders[cell.rowIndex][colIndex];
             if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                 count++;
-                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                    return true;
             }
             else
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkVerticalToBottom(cell: Cell, currentPlayer: Player): boolean {
+    private getVerticalDirectionToBottomCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        for (let i = cell.rowIndex; i < this._gameSize; i++) {
-            const currentPlaceholder = this._placeholders[i][cell.columnIndex];
+        const nextRowIndex = cell.rowIndex + 1;
+        if (nextRowIndex >= this._gameSize) return count;
+
+        for (let rowIndex = nextRowIndex; rowIndex < this._gameSize; rowIndex++) {
+            const currentPlaceholder = this._placeholders[rowIndex][cell.columnIndex];
             if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                 count++;
-                if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                    return true;
             }
             else
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkDiagonalToTopLeft(cell: Cell, currentPlayer: Player): boolean {
+    private getDiagonalToTopLeftCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        let cellRowIndex = cell.rowIndex;
-        for (let i = cell.columnIndex; i >= 0; i--) {
-            if (cellRowIndex >= 0) {
-                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+        const previousColumnIndex = cell.columnIndex - 1;
+        let previousRowIndex = cell.rowIndex - 1;
+        if (previousColumnIndex < 0 || previousRowIndex < 0) return count;
+
+        for (let colIndex = previousColumnIndex; colIndex >= 0; colIndex--) {
+            if (previousRowIndex >= 0) {
+                const currentPlaceholder = this._placeholders[previousRowIndex][colIndex];
                 if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                     count++;
-                    cellRowIndex--;
-                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                        return true;
+                    previousRowIndex--;
                 }
                 else
                     break;
@@ -291,20 +315,21 @@ export class GameBox implements BaseComponent {
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkDiagonalToBottomLeft(cell: Cell, currentPlayer: Player): boolean {
+    private getDiagonalToBottomLeftCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        let cellRowIndex = cell.rowIndex;
-        for (let i = cell.columnIndex; i >= 0; i--) {
-            if (cellRowIndex < this._gameSize) {
-                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+        const previousColumnIndex = cell.columnIndex - 1;
+        let nextRowIndex = cell.rowIndex + 1;
+        if (previousColumnIndex < 0 || nextRowIndex >= this._gameSize) return count;
+
+        for (let colIndex = previousColumnIndex; colIndex >= 0; colIndex--) {
+            if (nextRowIndex < this._gameSize) {
+                const currentPlaceholder = this._placeholders[nextRowIndex][colIndex];
                 if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                     count++;
-                    cellRowIndex++;
-                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                        return true;
+                    nextRowIndex++;
                 }
                 else
                     break;
@@ -313,20 +338,21 @@ export class GameBox implements BaseComponent {
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkDiagonalToTopRight(cell: Cell, currentPlayer: Player): boolean {
+    private getDiagonalToTopRightCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        let cellRowIndex = cell.rowIndex;
-        for (let i = cell.columnIndex; i < this._gameSize; i++) {
-            if (cellRowIndex >= 0) {
-                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+        const nextColumnIndex = cell.columnIndex + 1;
+        let previousRowIndex = cell.rowIndex - 1;
+        if (nextColumnIndex >= this._gameSize || previousRowIndex < 0) return count;
+
+        for (let colIndex = nextColumnIndex; colIndex < this._gameSize; colIndex++) {
+            if (previousRowIndex >= 0) {
+                const currentPlaceholder = this._placeholders[previousRowIndex][colIndex];
                 if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                     count++;
-                    cellRowIndex--;
-                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                        return true;
+                    previousRowIndex--;
                 }
                 else
                     break;
@@ -335,20 +361,21 @@ export class GameBox implements BaseComponent {
                 break;
         }
 
-        return false;
+        return count;
     }
 
-    private checkDiagonalToBottomRight(cell: Cell, currentPlayer: Player): boolean {
+    private getDiagonalToBottomRightCount(cell: Cell, currentPlayer: Player): number {
         let count = 0;
-        let cellRowIndex = cell.rowIndex;
-        for (let i = cell.columnIndex; i < this._gameSize; i++) {
-            if (cellRowIndex < this._gameSize) {
-                const currentPlaceholder = this._placeholders[cellRowIndex][i];
+        const nextColumnIndex = cell.columnIndex + 1;
+        let nextRowIndex = cell.rowIndex + 1;
+        if (nextColumnIndex >= this._gameSize || nextRowIndex >= this._gameSize) return count;
+
+        for (let colIndex = nextColumnIndex; colIndex < this._gameSize; colIndex++) {
+            if (nextRowIndex < this._gameSize) {
+                const currentPlaceholder = this._placeholders[nextRowIndex][colIndex];
                 if (this.isCurrentPlaceholderFilledByCurrentPlayer(currentPlaceholder, currentPlayer)) {
                     count++;
-                    cellRowIndex++;
-                    if (this.checkIfPlayerHasMinimumBeadsToWin(count))
-                        return true;
+                    nextRowIndex++;
                 }
                 else
                     break;
@@ -357,15 +384,10 @@ export class GameBox implements BaseComponent {
                 break;
         }
 
-        return false;
+        return count;
     }
 
     private isCurrentPlaceholderFilledByCurrentPlayer(placeholder: Placeholder, player: Player): boolean {
         return placeholder.hasBead() && placeholder.getBead().getPlayer().color === player.color;
-    }
-
-    private checkIfPlayerHasMinimumBeadsToWin(beadsCount: number): boolean {
-        const minBeadsCount = 4;
-        return beadsCount === minBeadsCount;
     }
 }

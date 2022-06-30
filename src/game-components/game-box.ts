@@ -388,6 +388,6 @@ export class GameBox implements BaseComponent {
     }
 
     private isCurrentPlaceholderFilledByCurrentPlayer(placeholder: Placeholder, player: Player): boolean {
-        return placeholder.hasBead() && placeholder.getBead().getPlayer().color === player.color;
+        return placeholder.hasBead() && placeholder.getBead().getPlayer().id === player.id;
     }
 }

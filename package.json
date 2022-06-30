@@ -22,6 +22,7 @@
   "homepage": "https://github.com/hedieh-chapardar/4InRow#readme",
   "devDependencies": {
     "@types/jquery": "^3.5.13",
+    "@types/uuid": "^8.3.4",
     "@webpack-cli/generators": "^2.4.1",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
@@ -31,6 +32,7 @@
   "dependencies": {
     "jquery": "^3.6.0",
     "rxjs": "^6.6.7",
-    "source-map-loader": "^3.0.1"
+    "source-map-loader": "^3.0.1",
+    "uuid": "^8.3.2"
   }
 }

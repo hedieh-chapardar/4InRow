@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { ColorEnum } from '../enums/color-enum';
 import { GameBox, GameInfo, Player } from '../game-components';
 import { getActivePlayerIndex } from '../helper/utilities';
@@ -15,7 +16,7 @@ export class Game {
     /**
      * players
      */
-    private _players: Player[] = [];
+    private _players: Player[];
     /**
      * Game info
      */
@@ -28,9 +29,7 @@ export class Game {
     constructor(gameSize: number, playersCount: number) {
         this._gameSize = gameSize;
         this._playersCount = playersCount;
-        this.initPlayers();
-        this.initGameInfo(this._players);
-        this.initGameBox(this._gameSize, this._players);
+        this.initGame();
     }
 
     draw(): void {
@@ -40,12 +39,19 @@ export class Game {
         $('#game').append([gameInfoElement, gameBoxElement]);
     }
 
+    private initGame(): void {
+        this.initPlayers();
+        this.initGameInfo(this._players);
+        this.initGameBox(this._gameSize, this._players);
+    }
+
     private initPlayers(): void {
+        this._players = [];
         for (let playerIndex = 0; playerIndex < this._playersCount; playerIndex++) {
-            const playerName = `Player ${playerIndex + 1}`;
-            const playerColor = this.assignColorToPlayer(playerIndex);
-            const isPlayerActive = playerIndex === 0;
-            const player = new Player(playerName, playerColor, isPlayerActive);
+            const name = `Player ${playerIndex + 1}`;
+            const color = this.assignColorToPlayer(playerIndex);
+            const isActive = playerIndex === 0;
+            const player = new Player(name, color, isActive);
             this._players.push(player);
         }
     }
@@ -103,7 +109,14 @@ export class Game {
         const currentPlayer: Player | null = this._gameBox.checkIfCurrentPlayerWins(cell);
 
         if (currentPlayer) {
-            alert(`${currentPlayer.name} wins!`);
+            Swal.fire({
+                title: `${currentPlayer.name} won!`,
+                icon: 'success',
+                confirmButtonText: 'Ok',
+            }).then(() => {
+                this.initGame();
+                this.draw();
+            });
         }
     }
 }

@@ -139,7 +139,7 @@ export class GameBox implements BaseComponent {
     }
 
     /**
-     * Handles click event on some random placeholder & add bead to suitable one 
+     * Handles click event on some random placeholder & adds bead to suitable one 
      */
     private onPlaceholderClick(columnIndex: number): void {
         if (!this._isGameBoxClickable) return;
